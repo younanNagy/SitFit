@@ -3,7 +3,7 @@ import cv2
 
 def nothing(x):
     pass
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
 # fgbg = cv2.createBackgroundSubtractorMOG2()
 cv2.namedWindow("Trackbars")
@@ -18,6 +18,7 @@ while(True):
 
     # Capture frame-by-frame
     ret, frame = cap.read()
+    frame = cv2.flip( frame, 1 )
     new_frame = cv2.convertScaleAbs(frame, alpha=alpha/100, beta = beta-50)
 
     # Our operations on the frame come here
@@ -25,6 +26,7 @@ while(True):
 
     # Display the resulting frame
     cv2.imshow('frame',new_frame)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 

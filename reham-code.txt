@@ -64,8 +64,10 @@ def blink_counter() :
 	print("[INFO] starting video stream thread...")
 	# vs = FileVideoStream(args["video"]).start()
 	# fileStream = True
-	vs = VideoStream(src=0).start()
+	#vs = VideoStream(src=0).start()
 	# vs = VideoStream(usePiCamera=True).start()
+	vs = cv2.VideoCapture(cv2.CAP_DSHOW)
+	
 	fileStream = False
 	time.sleep(1.0)
 
@@ -95,7 +97,7 @@ def blink_counter() :
 			# grab the frame from the threaded video file stream, resize
 			# it, and convert it to grayscale
 			# channels)
-			frame = vs.read()
+			ret,frame = vs.read()
 			frame = imutils.resize(frame, width=450)
 			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 

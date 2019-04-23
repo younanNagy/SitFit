@@ -9,21 +9,23 @@ class Position:
         self.image=None
         self.center=None
 
-    def SetPosition(self,image,threshold):
+    def set_position(self,image,threshold):
         # get the contour of this position
+        self.image=image
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
         ret, thresh_img = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY_INV)
         contours = cv2.findContours(thresh_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[-2]
         self.contour= max(contours, key = cv2.contourArea)
-        self.
+        center=cv2.moments(self.contour)
+        self.center=(int(center["m10"] / center["m00"]), int(center["m01"] / center["m00"]))
 
 
-    def GetDifference(self):
+    def get_difference(self):
         pass
 
 
-    def GetCorrelation(self):
+    def get_correlation(self):
         pass
 
 

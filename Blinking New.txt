@@ -93,3 +93,96 @@ def blink_counter() :
 	ap.add_argument("-v", "--video", type=str, default="",
 		help="path to input video file")
 	args = vars(ap.parse_args())
+	
+	# define two constants, one for the eye aspect ratio to indicate
+	# blink and then a second constant for the number of consecutive
+	# frames the eye must be below the threshold
+	EYE_AR_THRESH = 0.23
+	EYE_AR_CONSEC_FRAMES = 3
+
+	# initialize the frame counters and the total number of blinks
+	COUNTER = 0
+	TOTAL = 0
+
+	# initialize dlib's face detector (HOG-based) and then create
+	# the facial landmark predictor
+	print("[INFO] loading facial landmark predictor...")
+	detector = dlib.get_frontal_face_detector()
+	predictor = dlib.shape_predictor(args["shape_predictor"])
+
+	# grab the indexes of the facial landmarks for the left and
+	# right eye, respectively
+	#(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+	#(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+
+	# start the video stream thread
+	print("[INFO] starting video stream thread...")
+	# vs = FileVideoStream(args["video"]).start()
+	# fileStream = True
+	#vs = VideoStream(src=0).start()
+	# vs = VideoStream(usePiCamera=True).start()
+	vs = cv2.VideoCapture(cv2.CAP_DSHOW)
+	
+	fileStream = False
+	time.sleep(1.0)
+
+	time_count = 0
+	start_time = time.time()
+
+	#path file : C:\Users\Shamel\Documents\ipproject\shape_predictor_68_face_landmarks.dat
+
+	while True:
+		end_time = time.time()
+		current_time = end_time - start_time
+		#print(current_time)
+		if int(current_time) >= 60:
+			if TOTAL < 15:
+				print("warning blink more ya captain")
+			COUNTER = 0
+			TOTAL = 0
+			start_time = time.time()
+		else : #start salma part
+			# loop over frames from the video stream
+			
+			# if this is a file video stream, then we need to check if
+			# there any more frames left in the buffer to process
+			if fileStream and not vs.more():
+				break
+
+			# grab the frame from the threaded video file stream, resize
+			# it, and convert it to grayscale
+			# channels)
+			ret,frame = vs.read()
+			frame = imutils.resize(frame, width=450)
+			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+			# detect faces in the grayscale frame
+			rects = detector(gray, 0)
+			#rects = blink_detector(gray)
+			#print(rects)
+
+			# loop over the face detections
+			
+			flag_blink , COUNTER , ear , TOTAL= blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL)
+			print("fag blink : " , flag_blink)
+			# draw the total number of blinks on the frame along with
+			# the computed eye aspect ratio for the frame
+			cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
+				cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+			cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
+				cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+		
+			# show the frame
+			cv2.imshow("Frame", frame)
+			key = cv2.waitKey(1) & 0xFF
+		
+			# if the `q` key was pressed, break from the loop
+			if key == ord("q"):
+				break
+
+	# do a bit of cleanup
+	cv2.destroyAllWindows()
+	vs.stop()
+
+
+blink_counter()

@@ -35,6 +35,7 @@ def blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL):
 	EYE_AR_THRESH = 0.23
 	EYE_AR_CONSEC_FRAMES = 2
 
+
 	(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 	(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 	
@@ -62,6 +63,10 @@ def blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL):
 		# visualize each of the eyes
 		leftEyeHull = cv2.convexHull(leftEye)
 		rightEyeHull = cv2.convexHull(rightEye)
+		# l = max([leftEyeHull], key = cv2.contourArea)
+		# r = max([rightEyeHull], key = cv2.contourArea)
+		# print("left" , l)
+	
 		cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
 		cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
 

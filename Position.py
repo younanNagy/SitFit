@@ -38,16 +38,48 @@ class Position:
             
 
 
-    def get_difference(self):
-        pass
+    def get_difference(self,current_position):
+        #ret, thresh_img_calibrated = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY)
+        diff=self.image^current_position.image
+        #diff=np.absolute(diff)
+
+        diff = cv2.medianBlur(diff, 25)
+        non_zero_count=np.count_nonzero(diff)
+        sum=np.sum(diff)
+        if non_zero_count!=0:
+            normalized_diff=sum/non_zero_count
+        else:
+            normalized_diff=0
+
+        return normalized_diff
 
 
     def get_correlation(self):
         pass
 
 
-    def Compare(self):
-        pass
+    def compare(self,current_position,max_area_threshold,min_area_threshold,center_threshold,xor_threshold):
+        move_type="none"
+        area_difference=(self.area-current_position.area)/self.area
+        if area_difference>=max_area_threshold:
+            move_type="close"
+        elif area_difference<=min_area_threshold:
+            move_type="far"
+        else:
+            center_difference=(self.center[0]-current_position.center[0])#/frame_width
+            if center_difference>abs(center_threshold):
+                if center_difference>0:
+                    move_type="right"
+                else:
+                    move_type = "left"
+            else:
+                normalized_diff=self.get_difference(current_position)
+                if normalized_diff > xor_threshold:
+                    move_type = "uncomfortable_sit"
+                else:
+                    move_type = "none"
+
+        return move_type
 
 # position=Position()
 # position.SetPosition(2,4)

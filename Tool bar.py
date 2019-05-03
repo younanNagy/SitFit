@@ -2,13 +2,13 @@ from tkinter import *
 from PIL import Image,ImageTk
 from Position import *
 from Blinking import *
-from NOTIFICATION import *
+# from NOTIFICATION import *
 
 cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
  
-state =  "running"
+state =  "start"
 
 current_pos = Position()
 calibrated_pos = Position()
@@ -22,6 +22,7 @@ COUNTER = 0
 TOTAL = 0
 flag_initialized = False
 time_counter = 0
+flag_start_count = False
 start_time = time.time()
 time_threshold = 60  
 
@@ -188,11 +189,23 @@ alg2CheckButton.pack()
 # master.mainloop()
 # print("after")
 
+## Testing only ##########################################################
+def nothing(x):
+    pass
+cv2.namedWindow("Trackbars")
+cv2.createTrackbar("min threshold", "Trackbars", 0, 255, nothing)
+cv2.createTrackbar("alpha", "Trackbars",100 , 300, nothing)
+cv2.createTrackbar("beta", "Trackbars",50 , 100, nothing)
+#########################################################################
 while True:
     master.update_idletasks()
     master.update()
+ ## Testing only ##########################################################   
+    thres1 = cv2.getTrackbarPos("min threshold", "Trackbars")
+    alpha1 = cv2.getTrackbarPos("alpha", "Trackbars")
+    beta1 = cv2.getTrackbarPos("beta", "Trackbars")
+#########################################################################
 
-    # global thres, alpha, beta
     # Capture frame-by-frame
     ret, frame = cap.read()
     frame = cv2.flip( frame, 1 )
@@ -217,12 +230,17 @@ while True:
         else:
             end_time = time.time()
             current_time = end_time - start_time
+            if flag_start_count == True:
+                time_counter = end_time - start_time_human
+                if int(time_counter) >= 15:
+                    print("no one is sitting in front of the computer !!!!!")
+                    # Warning("Detection Error" , "No one is sitting in front of the computer")
+                    
             if int(current_time) >= 60:   
             	if TOTAL < 15:
-            		print("warning blink more ya captain")
+            		print("warning blink more !!!!")
             	COUNTER = 0
             	TOTAL = 0
-                
             	start_time = time.time()
 
             frame = imutils.resize(frame, width=450)
@@ -230,7 +248,14 @@ while True:
 
             rects = detector(gray, 0)
 
-            flag_blink , COUNTER , ear , TOTAL= blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL)
+            flag_blink , COUNTER , ear , TOTAL = blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL)
+
+            if ear == 0 and flag_start_count == False:
+                flag_start_count = True
+                start_time_human = time.time()
+            elif ear != 0 :
+                flag_start_count = False
+                time_counter = 0
 
             cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
@@ -239,14 +264,14 @@ while True:
             
             # show the frame
             cv2.imshow("Frame", frame)
-
-
-
         
+        # current_pos.set_position(frame,thres,alpha,beta)
+        # notification_type=calibrated_pos.compare(current_pos,area_threshold,center_threshold,xor_threshold)
 
 
-    ## get frame
-    ## 
+
+
+
     
 
 

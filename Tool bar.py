@@ -1,36 +1,51 @@
 from tkinter import *
 from PIL import Image,ImageTk
+from Position import *
+
+cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
+state = "start"
+
+thres = 0
+alpha = 0
+beta = 0
 
 def upon_select(widget,value):
     print("{}'s value is {}.".format(widget['text'],value))
 
-def print_value(val):
-    print(val)
+def update_threshold(val):
+    thres = val
+ 
+def update_contrast(val):
+    alpha = val
+
+def update_brightness(val):
+    beta = val      
 
 def topWindow():
     global topWindowFlag
     if topWindowFlag == 0:
+        state = "calibrated"
         topWindowFlag =1
         top = Toplevel() 
         top.title('calibrate')
         thresholdLabel= Label(top, text="threshold")
         thresholdLabel.pack()    
-        thresholdSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=print_value)
+        thresholdSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=update_threshold)
         thresholdSlider.set(50)
         #w.bind('<Button-1>', hide_me)
         thresholdSlider.pack()
 
         contrastLabel= Label(top, text="contrast")
         contrastLabel.pack()    
-        contrastSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL,command=print_value)
+        contrastSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL,command=update_contrast)
         contrastSlider.set(50)
         contrastSlider.pack()
 
         brightnessLabel= Label(top, text="brightness")
         brightnessLabel.pack() 
-        brightnessSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL,command=print_value)
+        brightnessSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL,command=update_brightness)
         brightnessSlider.set(50)
         brightnessSlider.pack()
 
@@ -94,21 +109,27 @@ master.geometry("100x300+300+300")
 
 
 
-exitImage = Image.open("exit3.png")
+exitImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//exit3.png")
 exitph = ImageTk.PhotoImage(exitImage)
 
-calibrateImage = Image.open("calibrate1.png")
+calibrateImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//calibrate1.png")
 calibrateph = ImageTk.PhotoImage(calibrateImage)
 
-blinkImage = Image.open("blink1.png")
+blinkImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//blink4.png")
 blinkph = ImageTk.PhotoImage(blinkImage)
 
-notificationImage = Image.open("notification1.png")
+notificationImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//notification1.png")
 notificationph = ImageTk.PhotoImage(notificationImage)
 
-streamImage = Image.open("stream1.png")
+streamImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//stream1.png")
 streamph = ImageTk.PhotoImage(streamImage)
 
+# def loop():
+#     while(True):
+#         i = 0
+#         i+=1
+
+#     return
 #BUTTONS
 exitButton = Button(master, text='Try', image=exitph, command=master.destroy)
 createToolTip(exitButton,"exit")
@@ -148,8 +169,29 @@ alg2CheckButton = Checkbutton(master, text='Alg2',onvalue=True, offvalue=False, 
 createToolTip(alg2CheckButton,"alg2")
 alg2CheckButton.pack()
 
-master.mainloop()
+# print("before")
+# master.mainloop()
+# print("after")
 
+current_pos = Position()
+calibrated_pos = Position()
+
+while True:
+    master.update_idletasks()
+    master.update()
+
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    frame = cv2.flip( frame, 1 )
+
+    if(state == "calibrate"):
+
+        
+
+
+    ## get frame
+    ## 
+    
 
 
 

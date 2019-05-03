@@ -1,34 +1,54 @@
 from tkinter import *
 from PIL import Image,ImageTk
 from Position import *
+from Blinking import *
+from NOTIFICATION import *
 
 cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
-state = "start"
+ 
+state =  "running"
+
+current_pos = Position()
+calibrated_pos = Position()
 
 thres = 0
 alpha = 0
 beta = 0
 
+#blinking variables
+COUNTER = 0
+TOTAL = 0
+flag_initialized = False
+time_counter = 0
+start_time = time.time()
+time_threshold = 60  
+
+
 def upon_select(widget,value):
     print("{}'s value is {}.".format(widget['text'],value))
 
 def update_threshold(val):
-    thres = val
+    global thres
+    thres =int(val)
  
 def update_contrast(val):
-    alpha = val
+    global alpha
+    alpha = int(val)
 
 def update_brightness(val):
-    beta = val      
+    global beta
+    beta = int(val)      
 
 def topWindow():
     global topWindowFlag
+    global state
     if topWindowFlag == 0:
-        state = "calibrated"
+        state = "calibrate"
         topWindowFlag =1
         top = Toplevel() 
+        top.resizable(False,False)
         top.title('calibrate')
         thresholdLabel= Label(top, text="threshold")
         thresholdLabel.pack()    
@@ -106,7 +126,7 @@ master = Tk("","","Toolbar",1)
  
 master.geometry("100x300+300+300")
 
-
+master.resizable(False,False)
 
 
 exitImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//exit3.png")
@@ -124,12 +144,7 @@ notificationph = ImageTk.PhotoImage(notificationImage)
 streamImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//stream1.png")
 streamph = ImageTk.PhotoImage(streamImage)
 
-# def loop():
-#     while(True):
-#         i = 0
-#         i+=1
 
-#     return
 #BUTTONS
 exitButton = Button(master, text='Try', image=exitph, command=master.destroy)
 createToolTip(exitButton,"exit")
@@ -173,18 +188,59 @@ alg2CheckButton.pack()
 # master.mainloop()
 # print("after")
 
-current_pos = Position()
-calibrated_pos = Position()
-
 while True:
     master.update_idletasks()
     master.update()
 
+    # global thres, alpha, beta
     # Capture frame-by-frame
     ret, frame = cap.read()
     frame = cv2.flip( frame, 1 )
-
+    print(state)
     if(state == "calibrate"):
+        print(thres)
+        current_pos.set_position(frame,thres,alpha,beta)
+        if current_pos.contour_flag == True:
+            cv2.drawContours(current_pos.image, [current_pos.contour], -1, (0,255,0), 3)
+
+        cv2.imshow('frame',current_pos.image)
+
+    elif(state == "running"):
+        #blinking part
+        if flag_initialized == False:
+            print("initializing face detector...")
+            detector = dlib.get_frontal_face_detector()
+            print("initializing face predictor...")
+            predictor = dlib.shape_predictor("D:\\Users\\samue\\Documents\\VSCode\\SitFit\\shape_predictor_68_face_landmarks.dat")
+            print("done initializing all")
+            flag_initialized = True
+        else:
+            end_time = time.time()
+            current_time = end_time - start_time
+            if int(current_time) >= 60:   
+            	if TOTAL < 15:
+            		print("warning blink more ya captain")
+            	COUNTER = 0
+            	TOTAL = 0
+                
+            	start_time = time.time()
+
+            frame = imutils.resize(frame, width=450)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            rects = detector(gray, 0)
+
+            flag_blink , COUNTER , ear , TOTAL= blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL)
+
+            cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            
+            # show the frame
+            cv2.imshow("Frame", frame)
+
+
 
         
 

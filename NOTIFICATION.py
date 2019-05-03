@@ -11,7 +11,7 @@ def Warning(Title,Body,Icon_Path,Duration):
             duration=Duration,                              # Duration in seconds
             urgency=Notification.URGENCY_CRITICAL
     ).send()
-
+ 
     winsound.PlaySound("D://Users//samue//Documents//VSCode//SitFit//Alarm2.wav",winsound.SND_ASYNC)
 
 

@@ -6,6 +6,8 @@ from NOTIFICATION import *
 
 
 
+
+
 cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
@@ -129,6 +131,7 @@ master = Tk("","","Toolbar",1)
 w = 55 # width for the Tk root
 h = 300 # height for the Tk root
 
+
 # get screen width and height
 ws = master.winfo_screenwidth() # width of the screen
 hs = master.winfo_screenheight() # height of the screen
@@ -142,6 +145,7 @@ y = (hs/2) - (h/2)
 master.geometry('%dx%d+%d+%d' % (w, h, x, y))
  
 #master.geometry("100x300+300+300")
+
 
 master.resizable(0,0)
 master.overrideredirect(1)

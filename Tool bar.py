@@ -3,6 +3,7 @@ from PIL import Image,ImageTk
 from Position import *
 from Blinking import *
 from NOTIFICATION import *
+
 import os
 
 
@@ -10,7 +11,7 @@ cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
  
-state =  "running"
+state =  "idle"
 
 current_pos = Position()
 calibrated_pos = Position()
@@ -123,12 +124,20 @@ def createToolTip(widget, text):
     widget.bind('<Enter>', enter)
     widget.bind('<Leave>', leave)
 
+def toggle():
+    #to get the present state of the toggle button
+    global state
+    if state == 'idle':
+        runButton.config(image=pauseph)
+        state = "running"
+    elif state == 'running':
+        runButton.config(image=streamph)
+        state = "idle"
 
     
 master = Tk("","","Toolbar",1)
 w = 55 # width for the Tk root
 h = 300 # height for the Tk root
-
 
 # get screen width and height
 ws = master.winfo_screenwidth() # width of the screen
@@ -143,7 +152,6 @@ y = (hs/2) - (h/2)
 master.geometry('%dx%d+%d+%d' % (w, h, x, y))
  
 #master.geometry("100x300+300+300")
-
 
 master.resizable(0,0)
 master.overrideredirect(1)
@@ -178,6 +186,10 @@ exitButton.pack()
 calibrateButton = Button(master, text='calibrate', image=calibrateph, command=lambda: topWindow())
 createToolTip(calibrateButton,"calibrate your position")
 calibrateButton.pack()
+
+runButton = Button(master, text='Run/Pause', image=streamph, command=toggle)
+createToolTip(runButton,"Run or pause SitFit")
+runButton.pack()
 
 #check boxes For ...
 
@@ -247,7 +259,7 @@ while True:
 
         cv2.imshow('frame',current_pos.image)    #show the contoured image
 
-    elif(state == "running"):
+    elif(state == "rrrrrrr"):
         #blinking part
         
         #initializing face detector and predictor

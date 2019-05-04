@@ -10,7 +10,7 @@ cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
  
-state =  "running"
+state =  "idle"
 
 current_pos = Position()
 calibrated_pos = Position()
@@ -123,6 +123,15 @@ def createToolTip(widget, text):
     widget.bind('<Enter>', enter)
     widget.bind('<Leave>', leave)
 
+def toggle():
+    #to get the present state of the toggle button
+    global state
+    if state == 'idle':
+        runButton.config(image=pauseph)
+        state = "running"
+    elif state == 'running':
+        runButton.config(image=streamph)
+        state = "idle"
 
     
 master = Tk("","","Toolbar",1)
@@ -176,6 +185,10 @@ exitButton.pack()
 calibrateButton = Button(master, text='calibrate', image=calibrateph, command=lambda: topWindow())
 createToolTip(calibrateButton,"calibrate your position")
 calibrateButton.pack()
+
+runButton = Button(master, text='Run/Pause', image=streamph, command=toggle)
+createToolTip(runButton,"Run or pause SitFit")
+runButton.pack()
 
 #check boxes For ...
 
@@ -244,7 +257,7 @@ while True:
 
         cv2.imshow('frame',current_pos.image)
 
-    elif(state == "running"):
+    elif(state == "rrrrrrr"):
         #blinking part
         print("blinking")
         if flag_initialized == False:

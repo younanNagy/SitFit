@@ -1,17 +1,14 @@
 from tkinter import *
 from PIL import Image,ImageTk
+
+
 from Position import *
-from Blinking import *
-from NOTIFICATION import *
-
-import os
-
 
 cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
  
-state =  "idle"
+state =  "start"
 
 current_pos = Position()
 calibrated_pos = Position()
@@ -20,14 +17,11 @@ thres = 0
 alpha = 0
 beta = 0
 
-#blinking variables
-COUNTER = 0   #counts number of frames of closed eyes
-TOTAL = 0     #total number of blinks
-flag_initialized = False    #flag to check if the detector and predictor are loaded
-time_counter = 0
-flag_start_count = False    #flag to check if someone is sitting
-start_time = time.time()    #start timer for eye blinking
-blinking_time_threshold = 60    #time to check the number of blinks
+#some thresholds
+negative_area_threshold = -40
+positive_area_threshold = 35
+center_threshold = 10
+xor_threshold = 8
 
 
 def upon_select(widget,value):
@@ -124,61 +118,32 @@ def createToolTip(widget, text):
     widget.bind('<Enter>', enter)
     widget.bind('<Leave>', leave)
 
-def toggle():
-    #to get the present state of the toggle button
-    global state
-    if state == 'idle':
-        runButton.config(image=pauseph)
-        state = "running"
-    elif state == 'running':
-        runButton.config(image=streamph)
-        state = "idle"
 
     
 master = Tk("","","Toolbar",1)
-w = 55 # width for the Tk root
-h = 300 # height for the Tk root
-
-# get screen width and height
-ws = master.winfo_screenwidth() # width of the screen
-hs = master.winfo_screenheight() # height of the screen
-
-# calculate x and y coordinates for the Tk master window
-x = 0
-y = (hs/2) - (h/2)
-
-# set the dimensions of the screen 
-# and where it is placed
-master.geometry('%dx%d+%d+%d' % (w, h, x, y))
  
-#master.geometry("100x300+300+300")
+master.geometry("100x300+300+300")
 
-master.resizable(0,0)
-master.overrideredirect(1)
-print( os.path.dirname(__file__))
-#Setting images for icons of the tool bar
-#required to change the path 
-exitImage = Image.open( os.path.dirname(__file__)+"\\exit3.png")
+master.resizable(False,False)
+
+
+exitImage = Image.open("D:\\projects\\0IMP_Projects\\Image Assignments\\Sit_fit\\SitFit\\exit3.png")
 exitph = ImageTk.PhotoImage(exitImage)
 
-calibrateImage = Image.open( os.path.dirname(__file__)+"//calibrate1.png")
+calibrateImage = Image.open("D:\\projects\\0IMP_Projects\\Image Assignments\\Sit_fit\\SitFit\\calibrate1.png")
 calibrateph = ImageTk.PhotoImage(calibrateImage)
 
-blinkImage = Image.open( os.path.dirname(__file__)+"//blink4.png")
+blinkImage = Image.open("D:\\projects\\0IMP_Projects\\Image Assignments\\Sit_fit\\SitFit\\blink1.png")
 blinkph = ImageTk.PhotoImage(blinkImage)
 
-notificationImage = Image.open( os.path.dirname(__file__)+"//notification1.png")
+notificationImage = Image.open("D:\\projects\\0IMP_Projects\\Image Assignments\\Sit_fit\\SitFit\\notification1.png")
 notificationph = ImageTk.PhotoImage(notificationImage)
 
-streamImage = Image.open( os.path.dirname(__file__)+"//stream1.png")
+streamImage = Image.open("D:\\projects\\0IMP_Projects\\Image Assignments\\Sit_fit\\SitFit\\stream1.png")
 streamph = ImageTk.PhotoImage(streamImage)
-
-# pauseImage = Image.open( os.path.dirname(__file__)+"//pause.png")
-# pauseph = ImageTk.PhotoImage(pauseImage)
 
 
 #BUTTONS
-#we use buttons ()
 exitButton = Button(master, text='Try', image=exitph, command=master.destroy)
 createToolTip(exitButton,"exit")
 exitButton.pack()
@@ -186,12 +151,6 @@ exitButton.pack()
 calibrateButton = Button(master, text='calibrate', image=calibrateph, command=lambda: topWindow())
 createToolTip(calibrateButton,"calibrate your position")
 calibrateButton.pack()
-
-runButton = Button(master, text='Run/Pause', image=streamph, command=toggle)
-createToolTip(runButton,"Run or pause SitFit")
-runButton.pack()
-
-#check boxes For ...
 
 blinkFlag= BooleanVar()
 blinkCheckButton = Checkbutton(master, text='Blinking-Check ON',image=blinkph,onvalue=True, offvalue=False, variable=blinkFlag
@@ -227,99 +186,47 @@ alg2CheckButton.pack()
 # master.mainloop()
 # print("after")
 
-## Testing only ##########################################################
-# def nothing(x):
-#     pass
-# cv2.namedWindow("Trackbars")
-# cv2.createTrackbar("min threshold", "Trackbars", 0, 255, nothing)
-# cv2.createTrackbar("alpha", "Trackbars",100 , 300, nothing)
-# cv2.createTrackbar("beta", "Trackbars",50 , 100, nothing)
-#########################################################################
-master.wm_attributes("-topmost", 1)
-
 while True:
     master.update_idletasks()
     master.update()
- ## Testing only ##########################################################   
-    # thres1 = cv2.getTrackbarPos("min threshold", "Trackbars")
-    # alpha1 = cv2.getTrackbarPos("alpha", "Trackbars")
-    # beta1 = cv2.getTrackbarPos("beta", "Trackbars")
-#########################################################################
 
+
+
+    # global thres, alpha, beta
     # Capture frame-by-frame
     ret, frame = cap.read()
-    frame = cv2.flip(frame, 1 )
-    
-    #calibrate state to set the threshold , alpha and beta values
+    frame = cv2.flip( frame, 1 )
+
+    #print(state)
     if(state == "calibrate"):
         # print(thres)
+        calibrated_pos.set_position(frame,thres,alpha,beta)
+        if calibrated_pos.contour_flag :
+           cv2.drawContours(calibrated_pos.colored_image, [calibrated_pos.contour], -1, (0,255,0), 3)
+
+        cv2.imshow('frame',calibrated_pos.colored_image)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            state="running"
+            cv2.destroyWindow('frame')
+
+
+    elif(state == "running"):
         current_pos.set_position(frame,thres,alpha,beta)
-        if current_pos.contour_flag == True:
-            cv2.drawContours(current_pos.image, [current_pos.contour], -1, (0,255,0), 3)
-
-        cv2.imshow('frame',current_pos.image)    #show the contoured image
-
-    elif(state == "rrrrrrr"):
-        #blinking part
-        
-        #initializing face detector and predictor
-        if flag_initialized == False:
-            # print("initializing face detector...")
-            detector = dlib.get_frontal_face_detector()
-            # print("initializing face predictor...")
-            predictor = dlib.shape_predictor( os.path.dirname(__file__)+"\\shape_predictor_68_face_landmarks.dat")
-            # print("done initializing all")
-            flag_initialized = True
-        else:
-            
-            end_time = time.time()
-            current_time = end_time - start_time   #calculate timer for counting blinks in one min
-            if flag_start_count == True:
-                time_counter = end_time - start_time_human  #calculate time for measuring if the person is sitting or not
-                if int(time_counter) >= 15:
-                    # print("no one is sitting in front of the computer !!!!!")
-                    Warning("Detection Error" , "No one is sitting in front of the computer")
-            
-            if int(current_time) >= blinking_time_threshold:   
-            	if TOTAL < 15:  #check if the min number of blinks is 15
-            		# print("warning blink more !!!!")
-                    Warning("Blink More" , "Blinking helps protect your eyes from dehydration")
-            	COUNTER = 0
-            	TOTAL = 0
-            	start_time = time.time()
-
-            frame = imutils.resize(frame, width=450)
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)    #get gray image 
-
-            rects = detector(gray, 0)   #get detected face
-            
-            flag_blink , COUNTER , ear , TOTAL = blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL)
-            
-            if ear == 0 and flag_start_count == False: #check if someone is sitting in front of the computer
-                flag_start_count = True  #no one is sitting
-                start_time_human = time.time()  #start timer if no one is sitting 
-            elif ear != 0 :
-                flag_start_count = False
-                time_counter = 0
-
-            cv2.putText(frame, "Blinks: {}".format(TOTAL), (10, 30),    #show the number of blinks on the stream
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)       
-            cv2.putText(frame, "EAR: {:.2f}".format(ear), (300, 30),   #show the ear on the streamed video
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-            
-            # show the frame
-            
-            cv2.imshow("Frame", frame)
-            
-        
-        # current_pos.set_position(frame,thres,alpha,beta)
-        # notification_type=calibrated_pos.compare(current_pos,area_threshold,center_threshold,xor_threshold)
+        notification_type=calibrated_pos.compare(current_pos,
+                                                 negative_area_threshold,
+                                                 positive_area_threshold,
+                                                 center_threshold,
+                                                 xor_threshold)
+        print(notification_type)
 
 
 
 
+'''cv2.imshow('frame',current_pos.image)
+        if cv2.waitKey(1) & 0xFF == ord('q')|z:
+            cv2.destroyWindow('frame'''
 
-    
+
 
 
 

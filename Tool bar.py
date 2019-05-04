@@ -4,6 +4,8 @@ from Position import *
 from Blinking import *
 # from NOTIFICATION import *
 
+
+
 cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
@@ -124,10 +126,25 @@ def createToolTip(widget, text):
 
     
 master = Tk("","","Toolbar",1)
- 
-master.geometry("100x300+300+300")
+w = 55 # width for the Tk root
+h = 300 # height for the Tk root
 
-master.resizable(False,False)
+# get screen width and height
+ws = master.winfo_screenwidth() # width of the screen
+hs = master.winfo_screenheight() # height of the screen
+
+# calculate x and y coordinates for the Tk master window
+x = 0
+y = (hs/2) - (h/2)
+
+# set the dimensions of the screen 
+# and where it is placed
+master.geometry('%dx%d+%d+%d' % (w, h, x, y))
+ 
+#master.geometry("100x300+300+300")
+
+master.resizable(0,0)
+master.overrideredirect(1)
 
 
 exitImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//exit3.png")
@@ -197,6 +214,8 @@ cv2.createTrackbar("min threshold", "Trackbars", 0, 255, nothing)
 cv2.createTrackbar("alpha", "Trackbars",100 , 300, nothing)
 cv2.createTrackbar("beta", "Trackbars",50 , 100, nothing)
 #########################################################################
+master.wm_attributes("-topmost", 1)
+
 while True:
     master.update_idletasks()
     master.update()

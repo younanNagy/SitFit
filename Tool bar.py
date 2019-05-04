@@ -2,13 +2,15 @@ from tkinter import *
 from PIL import Image,ImageTk
 from Position import *
 from Blinking import *
-# from NOTIFICATION import *
+from NOTIFICATION import *
+
+
 
 cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
  
-state =  "start"
+state =  "running"
 
 current_pos = Position()
 calibrated_pos = Position()
@@ -124,12 +126,28 @@ def createToolTip(widget, text):
 
     
 master = Tk("","","Toolbar",1)
+w = 55 # width for the Tk root
+h = 300 # height for the Tk root
+
+# get screen width and height
+ws = master.winfo_screenwidth() # width of the screen
+hs = master.winfo_screenheight() # height of the screen
+
+# calculate x and y coordinates for the Tk master window
+x = 0
+y = (hs/2) - (h/2)
+
+# set the dimensions of the screen 
+# and where it is placed
+master.geometry('%dx%d+%d+%d' % (w, h, x, y))
  
-master.geometry("100x300+300+300")
+#master.geometry("100x300+300+300")
 
-master.resizable(False,False)
+master.resizable(0,0)
+master.overrideredirect(1)
 
-
+#Setting images for icons of the tool bar
+#required to change the path 
 exitImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//exit3.png")
 exitph = ImageTk.PhotoImage(exitImage)
 
@@ -145,8 +163,12 @@ notificationph = ImageTk.PhotoImage(notificationImage)
 streamImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//stream1.png")
 streamph = ImageTk.PhotoImage(streamImage)
 
+pauseImage = Image.open("D://Users//samue//Documents//VSCode//SitFit//pause.png")
+pauseph = ImageTk.PhotoImage(pauseImage)
+
 
 #BUTTONS
+#we use buttons ()
 exitButton = Button(master, text='Try', image=exitph, command=master.destroy)
 createToolTip(exitButton,"exit")
 exitButton.pack()
@@ -154,6 +176,8 @@ exitButton.pack()
 calibrateButton = Button(master, text='calibrate', image=calibrateph, command=lambda: topWindow())
 createToolTip(calibrateButton,"calibrate your position")
 calibrateButton.pack()
+
+#check boxes For ...
 
 blinkFlag= BooleanVar()
 blinkCheckButton = Checkbutton(master, text='Blinking-Check ON',image=blinkph,onvalue=True, offvalue=False, variable=blinkFlag
@@ -190,20 +214,22 @@ alg2CheckButton.pack()
 # print("after")
 
 ## Testing only ##########################################################
-def nothing(x):
-    pass
-cv2.namedWindow("Trackbars")
-cv2.createTrackbar("min threshold", "Trackbars", 0, 255, nothing)
-cv2.createTrackbar("alpha", "Trackbars",100 , 300, nothing)
-cv2.createTrackbar("beta", "Trackbars",50 , 100, nothing)
+# def nothing(x):
+#     pass
+# cv2.namedWindow("Trackbars")
+# cv2.createTrackbar("min threshold", "Trackbars", 0, 255, nothing)
+# cv2.createTrackbar("alpha", "Trackbars",100 , 300, nothing)
+# cv2.createTrackbar("beta", "Trackbars",50 , 100, nothing)
 #########################################################################
+master.wm_attributes("-topmost", 1)
+
 while True:
     master.update_idletasks()
     master.update()
  ## Testing only ##########################################################   
-    thres1 = cv2.getTrackbarPos("min threshold", "Trackbars")
-    alpha1 = cv2.getTrackbarPos("alpha", "Trackbars")
-    beta1 = cv2.getTrackbarPos("beta", "Trackbars")
+    # thres1 = cv2.getTrackbarPos("min threshold", "Trackbars")
+    # alpha1 = cv2.getTrackbarPos("alpha", "Trackbars")
+    # beta1 = cv2.getTrackbarPos("beta", "Trackbars")
 #########################################################################
 
     # Capture frame-by-frame
@@ -220,6 +246,7 @@ while True:
 
     elif(state == "running"):
         #blinking part
+        print("blinking")
         if flag_initialized == False:
             print("initializing face detector...")
             detector = dlib.get_frontal_face_detector()
@@ -228,6 +255,7 @@ while True:
             print("done initializing all")
             flag_initialized = True
         else:
+            print("flag")
             end_time = time.time()
             current_time = end_time - start_time
             if flag_start_count == True:
@@ -235,7 +263,7 @@ while True:
                 if int(time_counter) >= 15:
                     print("no one is sitting in front of the computer !!!!!")
                     # Warning("Detection Error" , "No one is sitting in front of the computer")
-                    
+            
             if int(current_time) >= 60:   
             	if TOTAL < 15:
             		print("warning blink more !!!!")
@@ -246,10 +274,11 @@ while True:
             frame = imutils.resize(frame, width=450)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+            print("flag4")
             rects = detector(gray, 0)
-
+            print("flag6")
             flag_blink , COUNTER , ear , TOTAL = blink_detector(frame , gray , rects , COUNTER , predictor , TOTAL)
-
+            print("flag5")
             if ear == 0 and flag_start_count == False:
                 flag_start_count = True
                 start_time_human = time.time()
@@ -263,7 +292,9 @@ while True:
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             
             # show the frame
+            print("flag3")
             cv2.imshow("Frame", frame)
+            print("flag2")
         
         # current_pos.set_position(frame,thres,alpha,beta)
         # notification_type=calibrated_pos.compare(current_pos,area_threshold,center_threshold,xor_threshold)

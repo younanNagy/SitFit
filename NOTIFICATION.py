@@ -3,11 +3,11 @@ import winsound
 from PIL import Image,ImageTk
 
 
-def Warning(Title,Body,Icon_Path,Duration):
+def Warning(Title,Body,Icon_Path="",Duration=20):
     Notification(
             title=Title,
             description=Body,
-            #icon_path=warningph, # On Windows .ico is required, on Linux - .png
+            #icon_path=Icon_Path, # On Windows .ico is required, on Linux - .png
             duration=Duration,                              # Duration in seconds
             urgency=Notification.URGENCY_CRITICAL
     ).send()
@@ -19,6 +19,6 @@ def Warning(Title,Body,Icon_Path,Duration):
 
 def main():
     Warning("Warning","You have been sitting to close to the screen for X seconds",
-            "D://Users//samue//Documents//VSCode//SitFit//Warn.png",20)
+            "D://Users//samue//Documents//VSCode//SitFit//Warning.ico",20)
 
-main()
+# main()

@@ -37,6 +37,221 @@ start_time = time.time()    #start timer for eye blinking
 blinking_time_threshold = 60    #time to check the number of blinks
 '''
 
+
+'''
+def upon_select(widget, value):
+    print("{}'s value is {}.".format(widget['text'], value))
+
+
+def update_threshold(val):
+    global thres
+    thres = int(val)
+
+
+def update_contrast(val):
+    global alpha
+    alpha = int(val)
+
+
+def update_brightness(val):
+    global beta
+    beta = int(val)
+
+
+def topWindow():
+    global topWindowFlag
+    global state
+    if topWindowFlag == 0:
+        state = "calibrate"
+        topWindowFlag = 1
+        top = Toplevel()
+        top.resizable(False, False)
+        top.title('calibrate')
+        thresholdLabel = Label(top, text="threshold")
+        thresholdLabel.pack()
+        thresholdSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=update_threshold)
+        thresholdSlider.set(50)
+        # w.bind('<Button-1>', hide_me)
+        thresholdSlider.pack()
+
+        contrastLabel = Label(top, text="contrast")
+        contrastLabel.pack()
+        contrastSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=update_contrast)
+        contrastSlider.set(50)
+        contrastSlider.pack()
+
+        brightnessLabel = Label(top, text="brightness")
+        brightnessLabel.pack()
+        brightnessSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=update_brightness)
+        brightnessSlider.set(50)
+        brightnessSlider.pack()
+
+
+def on_enter(widget, event):
+    widget.configure(text="Hello world")
+
+
+def on_leave(widget, enter):
+    widget.configure(text="")
+
+
+class ToolTip(object):
+    def __init__(self, widget):
+        self.widget = widget
+        self.tipwindow = None
+        self.id = None
+        self.x = self.y = 0
+
+    def showtip(self, text):
+        "Display text in tooltip window"
+        self.text = text
+        if self.tipwindow or not self.text:
+            return
+        x, y, cx, cy = self.widget.bbox("insert")
+        x = x + self.widget.winfo_rootx() + 27
+        y = y + cy + self.widget.winfo_rooty() + 27
+        self.tipwindow = tw = Toplevel(self.widget)
+        tw.wm_overrideredirect(1)
+        tw.wm_geometry("+%d+%d" % (x, y))
+        try:
+            # For Mac OS
+            tw.tk.call("::tk::unsupported::MacWindowStyle",
+                       "style", tw._w,
+                       "help", "noActivates")
+        except TclError:
+            pass
+        label = Label(tw, text=self.text, justify=LEFT,
+                      background="#ffffe0", relief=SOLID, borderwidth=1,
+                      font=("tahoma", "8", "normal"))
+        label.pack(ipadx=1)
+
+    def hidetip(self):
+        tw = self.tipwindow
+        self.tipwindow = None
+        if tw:
+            tw.destroy()
+
+
+def createToolTip(widget, text):
+    toolTip = ToolTip(widget)
+
+    def enter(event):
+        toolTip.showtip(text)
+
+    def leave(event):
+        toolTip.hidetip()
+
+    widget.bind('<Enter>', enter)
+    widget.bind('<Leave>', leave)
+
+
+def toggle():
+    # to get the present state of the toggle button
+    global state
+    if state == 'idle':
+        runButton.config(image=pauseph)
+        state = "running"
+    elif state == 'running':
+        runButton.config(image=streamph)
+        state = "idle"
+
+
+master = Tk("", "", "Toolbar", 1)
+w = 55  # width for the Tk root
+h = 300  # height for the Tk root
+
+# get screen width and height
+ws = master.winfo_screenwidth()  # width of the screen
+hs = master.winfo_screenheight()  # height of the screen
+
+# calculate x and y coordinates for the Tk master window
+x = 0
+y = (hs / 2) - (h / 2)
+
+# set the dimensions of the screen
+# and where it is placed
+master.geometry('%dx%d+%d+%d' % (w, h, x, y))
+master.resizable(0, 0)
+master.overrideredirect(1)
+# print(os.path.dirname(__file__))
+# Setting images for icons of the tool bar
+# required to change the path
+exitImage = Image.open(os.path.dirname(__file__) + "\\exit3.png")
+exitph = ImageTk.PhotoImage(exitImage)
+
+calibrateImage = Image.open(os.path.dirname(__file__) + "//calibrate1.png")
+calibrateph = ImageTk.PhotoImage(calibrateImage)
+
+blinkImage = Image.open(os.path.dirname(__file__) + "//blink4.png")
+blinkph = ImageTk.PhotoImage(blinkImage)
+
+notificationImage = Image.open(os.path.dirname(__file__) + "//notification1.png")
+notificationph = ImageTk.PhotoImage(notificationImage)
+
+streamImage = Image.open(os.path.dirname(__file__) + "//stream1.png")
+streamph = ImageTk.PhotoImage(streamImage)
+
+pauseImage = Image.open( os.path.dirname(__file__)+"//pause.png")
+pauseph = ImageTk.PhotoImage(pauseImage)
+
+
+# BUTTONS
+# we use buttons ()
+exitButton = Button(master, text='Try', image=exitph, command=master.destroy)
+createToolTip(exitButton, "exit")
+exitButton.pack()
+
+calibrateButton = Button(master, text='calibrate', image=calibrateph, command=lambda: topWindow())
+createToolTip(calibrateButton, "calibrate your position")
+calibrateButton.pack()
+
+runButton = Button(master, text='Run/Pause', image=streamph, command=toggle)
+createToolTip(runButton, "Run or pause SitFit")
+runButton.pack()
+
+
+# check boxes For ...
+
+blinkFlag = BooleanVar()
+blinkCheckButton = Checkbutton(master, text='Blinking-Check ON', image=blinkph, onvalue=True, offvalue=False,
+                               variable=blinkFlag
+                               , command=lambda: upon_select(blinkCheckButton, blinkFlag.get()))
+createToolTip(blinkCheckButton, "blinking count on/off")
+blinkCheckButton.pack()
+
+notificationFlag = BooleanVar()
+notificationCheckButton = Checkbutton(master, text='Notification ON', image=notificationph, onvalue=True,
+                                      offvalue=False, variable=notificationFlag
+                                      , command=lambda: upon_select(notificationCheckButton, notificationFlag.get()))
+createToolTip(notificationCheckButton, "notification on/off")
+notificationCheckButton.pack()
+
+streamFlag = BooleanVar()
+streamCheckButton = Checkbutton(master, text='Stream ON', image=streamph, onvalue=True, offvalue=False,
+                                variable=streamFlag
+                                , command=lambda: upon_select(streamCheckButton, streamFlag.get()))
+createToolTip(streamCheckButton, "stream on/off")
+streamCheckButton.pack()
+
+alg1Flag = BooleanVar()
+alg1CheckButton = Checkbutton(master, text='Alg1', onvalue=True, offvalue=False, variable=alg1Flag
+                              , command=lambda: upon_select(alg1CheckButton, alg1Flag.get()))
+createToolTip(alg1CheckButton, "alg1")
+alg1CheckButton.pack()
+
+alg2Flag = BooleanVar()
+alg2CheckButton = Checkbutton(master, text='Alg2', onvalue=True, offvalue=False, variable=alg2Flag
+                              , command=lambda: upon_select(alg2CheckButton, alg2Flag.get()))
+createToolTip(alg2CheckButton, "alg2")
+alg2CheckButton.pack()
+
+# print("before")
+# master.mainloop()
+# print("after")
+
+
+master.wm_attributes("-topmost", 1)'''
+
 window=GUI_class()
 
 while True:
@@ -47,26 +262,29 @@ while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
     frame = cv2.flip(frame, 1 )
-    print(window.state)
+    #print(window.state)
     #calibrate state to set the threshold , alpha and beta values
-    if(state == "calibrate"):
-        calibrated_pos.set_position(frame, thres, alpha, beta)
+    if(window.state == "calibrate"):
+        calibrated_pos.set_position(frame, window.thres, window.alpha, window.beta)
+        #draw the contour on the captured frame
         if calibrated_pos.contour_flag:
             cv2.drawContours(calibrated_pos.colored_image, [calibrated_pos.contour], -1, (0, 255, 0), 3)
 
-        print(calibrated_pos.colored_image.shape)
+        # Guide cross
         cv2.line(calibrated_pos.colored_image, (int(calibrated_pos.colored_image.shape[1]/2), 0),
                  (int(calibrated_pos.colored_image.shape[1]/2),calibrated_pos.colored_image.shape[0]), (0, 0, 255), 1)
-
         cv2.line(calibrated_pos.colored_image, (0, int(calibrated_pos.colored_image.shape[0]/2)),
                  (calibrated_pos.colored_image.shape[1], int(calibrated_pos.colored_image.shape[0]/2)), (0, 0, 255),1)
 
+
         cv2.imshow('frame', calibrated_pos.colored_image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            state = "running"
-            cv2.destroyWindow('frame')
+            window.state = "running"
+            #cv2.destroyWindow('frame')
 
-    elif(state == "running"):
+    elif(window.state == "running"):
+
+        cv2.destroyWindow('frame')
         '''
         #blinking part
         
@@ -120,7 +338,7 @@ while True:
             cv2.imshow("Frame", frame)
             '''
 
-        current_pos.set_position(frame, thres, alpha, beta)
+        current_pos.set_position(frame, window.thres, window.alpha, window.beta)
         notification_type = calibrated_pos.compare(current_pos,
                                                    negative_area_threshold,
                                                    positive_area_threshold,

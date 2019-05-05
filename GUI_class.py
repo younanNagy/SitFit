@@ -11,32 +11,35 @@ class GUI_class:
 
     def __init__(self):
         self.master = Tk("", "", "Toolbar", 1)
-        w = 55  # width for the Tk root
-        h = 300  # height for the Tk root
+        self.top = None
+        self.w = 55  # width for the Tk root
+        self.h = 300  # height for the Tk root
 
         # get screen width and height
-        ws = self.master.winfo_screenwidth()  # width of the screen
-        hs = self.master.winfo_screenheight()  # height of the screen
+        self.ws = self.master.winfo_screenwidth()  # width of the screen
+        self.hs = self.master.winfo_screenheight()  # height of the screen
 
         # calculate x and y coordinates for the Tk master window
         x = 0
-        y = (hs / 2) - (h / 2)
+        y = (self.hs / 2) - (self.h / 2)
 
-        self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        self.master.geometry('%dx%d+%d+%d' % (self.w, self.h, x, y))
         self.master.resizable(0, 0)
         self.master.overrideredirect(1)
         self.master.wm_attributes("-topmost", 1)
 
         exitImage = pil.Image.open(os.path.dirname(__file__) + "\\exit3.png")
-        calibrateImage = pil.Image.open(os.path.dirname(__file__) + "//calibrate1.png")
-        blinkImage = pil.Image.open(os.path.dirname(__file__) + "//blink4.png")
-        notificationImage = pil.Image.open(os.path.dirname(__file__) + "//notification1.png")
-        streamImage = pil.Image.open(os.path.dirname(__file__) + "//stream1.png")
-        pauseImage = pil.Image.open(os.path.dirname(__file__) + "//pause.png")
+        calibrateBlackImage = pil.Image.open(os.path.dirname(__file__) + "\\calibrate_black.png")
+        calibrateGreenImage = pil.Image.open(os.path.dirname(__file__) + "\\calibrate_green.png")
+        blinkImage = pil.Image.open(os.path.dirname(__file__) + "\\blink4.png")
+        notificationImage = pil.Image.open(os.path.dirname(__file__) + "\\notification1.png")
+        streamImage = pil.Image.open(os.path.dirname(__file__) + "\\stream1.png")
+        pauseImage = pil.Image.open(os.path.dirname(__file__) + "\\pause.png")
 
         #Button Images
         self.exitph = pil.ImageTk.PhotoImage(exitImage)
-        self.calibrateph = pil.ImageTk.PhotoImage(calibrateImage)
+        self.calibrate_blackph = pil.ImageTk.PhotoImage(calibrateBlackImage)
+        self.calibrate_greenph = pil.ImageTk.PhotoImage(calibrateGreenImage)        
         self.blinkph = pil.ImageTk.PhotoImage(blinkImage)
         self.notificationph = pil.ImageTk.PhotoImage(notificationImage)
         self.streamph = pil.ImageTk.PhotoImage(streamImage)
@@ -45,13 +48,13 @@ class GUI_class:
 
         #Buttons
         self.exitButton = Button(self.master, text='Try', image=self.exitph, command=self.master.destroy)
-        self.calibrateButton = Button(self.master, text='calibrate', image=self.calibrateph, command=lambda: self.topWindow())
+        self.calibrateButton = Button(self.master, text='calibrate', image=self.calibrate_blackph, command=self.calibrate)
         self.runButton = Button(self.master, text='Run/Pause', image=self.streamph, command=self.toggle)
 
         #Place the buttons on the main window
-        self.exitButton.pack()
         self.calibrateButton.pack()
         self.runButton.pack()
+        self.exitButton.pack()
 
         #define popup tip
         createToolTip(self.calibrateButton, "calibrate your position")
@@ -59,7 +62,7 @@ class GUI_class:
 
         # some thresholds and flags for the GUI
         self.topWindowFlag=0
-        self.state="running"
+        self.state="start"
         self.thres = 0
         self.alpha = 0
         self.beta = 0
@@ -78,34 +81,51 @@ class GUI_class:
             self.runButton.config(image=self.streamph)
             self.state = "idle"
 
+    def calibrate(self):
+        # to get the present state of the toggle button
 
+        if self.state != 'calibrate':
+            self.calibrateButton.config(image=self.calibrate_greenph)
+            self.topWindow()
+            self.state = "calibrate"
+        else:
+            self.calibrateButton.config(image=self.calibrate_blackph)
+            self.topWindow()
+            self.state = "idle"
 
     def topWindow(self):
-
         if self.topWindowFlag == 0:
-            self.state = "calibrate"
+            self.top= Toplevel()
             self.topWindowFlag = 1
-            top = Toplevel()
-            top.resizable(False, False)
-            top.title('calibrate')
-            thresholdLabel = Label(top, text="threshold")
+            # calculate x and y coordinates for the Tk master window
+            x = self.w
+            y = (self.hs / 2) - (self.h / 2)
+
+            self.top.geometry('%dx%d+%d+%d' % (100, self.h, x, y))
+            self.top.resizable(0, 0)
+            self.top.overrideredirect(1)
+            self.top.wm_attributes("-topmost", 1)
+            thresholdLabel = Label(self.top, text="threshold")
             thresholdLabel.pack()
-            thresholdSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=self.update_threshold)
+            thresholdSlider = Scale(self.top, from_=0, to=200, orient=HORIZONTAL, command=self.update_threshold)
             thresholdSlider.set(50)
             # w.bind('<Button-1>', hide_me)
             thresholdSlider.pack()
 
-            contrastLabel = Label(top, text="contrast")
+            contrastLabel = Label(self.top, text="contrast")
             contrastLabel.pack()
-            contrastSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=self.update_contrast)
+            contrastSlider = Scale(self.top, from_=0, to=200, orient=HORIZONTAL, command=self.update_contrast)
             contrastSlider.set(50)
             contrastSlider.pack()
 
-            brightnessLabel = Label(top, text="brightness")
+            brightnessLabel = Label(self.top, text="brightness")
             brightnessLabel.pack()
-            brightnessSlider = Scale(top, from_=0, to=200, orient=HORIZONTAL, command=self.update_brightness)
+            brightnessSlider = Scale(self.top, from_=0, to=200, orient=HORIZONTAL, command=self.update_brightness)
             brightnessSlider.set(50)
             brightnessSlider.pack()
+        else:
+            self.topWindowFlag = 0
+            self.top.destroy()
 
 
 

@@ -10,7 +10,7 @@ cap = cv2.VideoCapture(cv2.CAP_DSHOW)
 
 topWindowFlag =0
  
-state =  "idle"
+state =  "running"
 
 current_pos = Position()
 calibrated_pos = Position()
@@ -95,6 +95,8 @@ class ToolTip(object):
         y = y + cy + self.widget.winfo_rooty() +27
         self.tipwindow = tw = Toplevel(self.widget)
         tw.wm_overrideredirect(1)
+        tw.wm_attributes("-topmost", 1)
+
         tw.wm_geometry("+%d+%d" % (x, y))
         try:
             # For Mac OS
@@ -154,6 +156,10 @@ master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
 master.resizable(0,0)
 master.overrideredirect(1)
+# master.lift()
+# master.wm_attributes("-transparentcolor", "white")
+# master.wm_attributes("-disabled", True)
+
 
 #Setting images for icons of the tool bar
 #required to change the path 
@@ -257,7 +263,7 @@ while True:
 
         cv2.imshow('frame',current_pos.image)
 
-    elif(state == "rrrrrrr"):
+    elif(state == "running"):
         #blinking part
         print("blinking")
         if flag_initialized == False:

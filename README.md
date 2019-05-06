@@ -1,1 +1,3 @@
-# SitFit
+# Project Title
+
+SitFit

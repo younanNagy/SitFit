@@ -4,7 +4,9 @@ SitFit
 
 # Project Description
 
+```
 SitFit is a personal assistant desktop app for a healthy and comfortable laptop experience
+```
 
 # Goals
 

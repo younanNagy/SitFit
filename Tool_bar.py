@@ -43,7 +43,7 @@ while True:
     #master.update_idletasks()
     #master.update()
     window.update()
-    # print(window.state)
+    print(window.state)
     # Capture frame-by-frame
     ret, frame = cap.read()
     frame = cv2.flip(frame, 1 )
@@ -72,11 +72,11 @@ while True:
         
         #initializing face detector and predictor
         if flag_initialized == False:
-            # print("initializing face detector...")
+            print("initializing face detector...")
             detector = dlib.get_frontal_face_detector()
-            # print("initializing face predictor...")
+            print("initializing face predictor...")
             predictor = dlib.shape_predictor( os.path.dirname(__file__)+"\\shape_predictor_68_face_landmarks.dat")
-            # print("done initializing all")
+            print("done initializing all")
             flag_initialized = True
         else:
             
@@ -132,6 +132,9 @@ while True:
 
     elif(window.state == "idle"):
          cv2.destroyWindow('Calibration')
+    elif(window.state == "exit"):
+        break
+    
        
     
 

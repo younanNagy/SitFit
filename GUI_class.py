@@ -11,6 +11,7 @@ class GUI_class:
 
     def __init__(self):
         self.master = Tk("", "", "Toolbar", 1)
+        self.master_destroyed = False
         self.top = None
         self.w = 55  # width for the Tk root
         self.h = 300  # height for the Tk root
@@ -47,7 +48,7 @@ class GUI_class:
 
 
         #Buttons
-        self.exitButton = Button(self.master, text='Try', image=self.exitph, command=self.master.destroy)
+        self.exitButton = Button(self.master, text='Try', image=self.exitph, command=self.exit2)
         self.calibrateButton = Button(self.master, text='calibrate', image=self.calibrate_blackph, command=self.calibrate)
         self.runButton = Button(self.master, text='Run/Pause', image=self.streamph, command=self.toggle)
 
@@ -68,8 +69,17 @@ class GUI_class:
         self.beta = 0
 
     def update(self):
-        self.master.update_idletasks()
-        self.master.update()
+        if self.master_destroyed == False:
+            self.master.update_idletasks()
+            self.master.update()
+
+    def exit2(self):
+        self.state = "exit"
+        # print( self.topWindowFlag)
+        # self.master_destroyed = True
+        # self.master.destroy()
+        # if self.topWindowFlag == 1:        
+        #     self.topWindow()
 
     def toggle(self):
         # to get the present state of the toggle button

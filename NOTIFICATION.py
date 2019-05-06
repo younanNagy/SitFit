@@ -2,8 +2,8 @@ from pynotifier import Notification
 import winsound
 from PIL import Image,ImageTk
 
-
-def Warning(Title,Body,Icon_Path="",Duration=20):
+import os
+def Warning(Title,Body,Icon_Path="",Duration=5):
     Notification(
             title=Title,
             description=Body,
@@ -12,13 +12,13 @@ def Warning(Title,Body,Icon_Path="",Duration=20):
             urgency=Notification.URGENCY_CRITICAL
     ).send()
  
-    winsound.PlaySound("D://Users//samue//Documents//VSCode//SitFit//Alarm2.wav",winsound.SND_ASYNC)
+    winsound.PlaySound(os.path.dirname(__file__) + "\\Alarm2.wav",winsound.SND_ASYNC)
 
 
 
-
+'''
 def main():
     Warning("Warning","You have been sitting to close to the screen for X seconds",
             "D://Users//samue//Documents//VSCode//SitFit//Warning.ico",20)
-
-# main()
+'''
+#main()

@@ -34,13 +34,21 @@ Note that we are working with python 3.6.8
 
 ```
 First you need to setup an environment in anaconda navigator,make sure to select python vesion 3.6.8 and then download the next libraries in this environment.
-1. Download dlib from the link in this video [ https://www.youtube.com/watch?v=KuVT3YYxFrU&fbclid=IwAR0rw-xap8V1qy5gA1gH6S-N5cIIvwan6qYdSzRM3A8vPX4_9XYFVO_hOiU ].
+1. Download dlib through this command [pip install cmake] then
+                                      [pip install dlib --verbose] this could take a while
+                                      
 2. Download imutils through this command [conda install -c pjamesjoyce imutils].
 3. Download scipy through this command[conda install -c anaconda scipy].
+4. Download opencv through this command[conda install -c anaconda opencv].
+5. Download numpy through this command[conda install -c anaconda numpy].
+6. Download py-notifier through this command[conda install -c anaconda py-notifier].
+7. Download win10toast through this command[conda install -c anaconda win10toast].
+8. Download pillow through this command[conda install -c anaconda pillow].
+
 ```
 
-## Deployment
+## RUN
 
 ```
-1. Run script file.
+1. python Sit_fit.py
 ```

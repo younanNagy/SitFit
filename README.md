@@ -23,24 +23,24 @@ SitFit is a personal assistant desktop app for a healthy and comfortable laptop 
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Installing
-
-```
-Run script file.
-```
-
 ### Prerequisites
 
 What things you need to install the software and how to install them
 
 ```
-1. Download Anaconda from the link [https://www.anaconda.com/distribution/#download-section],note that we are working with python 3.6.8
-2. Download dlib from the link in this video [ https://www.youtube.com/watch?v=KuVT3YYxFrU&fbclid=IwAR0rw-xap8V1qy5gA1gH6S-N5cIIvwan6qYdSzRM3A8vPX4_9XYFVO_hOiU ].
-3. Download imutils through this command [conda install -c pjamesjoyce imutils]
+Download Anaconda from the link [https://www.anaconda.com/distribution/#download-section].
+Note that we are working with python 3.6.8
+```
+
+### Installing
+
+```
+1. Download dlib from the link in this video [ https://www.youtube.com/watch?v=KuVT3YYxFrU&fbclid=IwAR0rw-xap8V1qy5gA1gH6S-N5cIIvwan6qYdSzRM3A8vPX4_9XYFVO_hOiU ].
+2. Download imutils through this command [conda install -c pjamesjoyce imutils]
 ```
 
 ## Deployment
 
 ```
-1. 
+1. Run script file.
 ```

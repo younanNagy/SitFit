@@ -1,6 +1,4 @@
-# Project Title
-
-SitFit
+# SitFit
 
 # Project Description
 
@@ -35,8 +33,10 @@ Note that we are working with python 3.6.8
 ### Installing
 
 ```
+First you need to setup an environment in anaconda navigator,make sure to select python vesion 3.6.8 and then download the next libraries in this environment.
 1. Download dlib from the link in this video [ https://www.youtube.com/watch?v=KuVT3YYxFrU&fbclid=IwAR0rw-xap8V1qy5gA1gH6S-N5cIIvwan6qYdSzRM3A8vPX4_9XYFVO_hOiU ].
-2. Download imutils through this command [conda install -c pjamesjoyce imutils]
+2. Download imutils through this command [conda install -c pjamesjoyce imutils].
+3. Download scipy through this command[conda install -c anaconda scipy].
 ```
 
 ## Deployment

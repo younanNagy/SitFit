@@ -8,7 +8,8 @@
 
 # Project Description
 
-SitFit is a personal assistant desktop app for a healthy and comfortable laptop experience.
+SitFit is a personal assistant desktop app for a healthy and comfortable laptop experience. Check video [here](https://youtu.be/UXKte1Qf39A).
+
 
 
 # Goals

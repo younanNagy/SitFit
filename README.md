@@ -14,7 +14,7 @@ SitFit is a personal assistant desktop app for a healthy and comfortable laptop 
 # Goals
 
 1. Warns user when his/her position along with the screen’s position are not in the right position.
-2. It may advise the user what to do to set the sitting position correctly.
+2. It advises the user what to do to set the sitting position correctly.
 3. Warns the user after sitting continuously for a long time.
 4. Detects if nobody is sitting in front of the computer.
 5. Warns the person if he is not blinking enough this helps protect his eyes from dehydration.

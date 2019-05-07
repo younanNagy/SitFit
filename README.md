@@ -38,15 +38,15 @@ Note that we are working with python 3.6.8
 
 First you need to setup an environment in anaconda navigator,make sure to select python vesion 3.6.8 and then download the next libraries in this environment.
 ```
-1. Download cmake through this command [pip install cmake]
-2. Download dlib through this command [pip install dlib --verbose] this could take a while.                                     
-3. Download imutils through this command [conda install -c pjamesjoyce imutils].
-4. Download scipy through this command [conda install -c anaconda scipy].
-5. Download opencv through this command [conda install -c anaconda opencv].
-6. Download numpy through this command [conda install -c anaconda numpy].
-7. Download py-notifier through this command [conda install -c anaconda py-notifier].
-8. Download win10toast through this command [conda install -c anaconda win10toast].
-9. Download pillow through this command [conda install -c anaconda pillow].
+pip install cmake
+pip install dlib --verbose                                    
+conda install -c pjamesjoyce imutils
+conda install -c anaconda scipy
+conda install -c anaconda opencv
+conda install -c anaconda numpy
+conda install -c anaconda py-notifier
+conda install -c anaconda win10toast
+conda install -c anaconda pillow
 ```
 
 ## Executing
